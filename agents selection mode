@@ -1,0 +1,69 @@
+
+import pandas as pd
+
+
+data=pd.read_csv(r'C:\Users\VAMSHI\Downloads\agent_information.csv')
+print(data.shape)
+
+data.columns
+
+data=data.replace("Yes",1)
+data=data.replace("No",0)
+
+data.head()
+
+data.dtypes
+
+
+
+Issues=['support','sales','spanish speaker']
+
+def issue_assigned_agent_list(data,agent_selection_mode,Issues):
+  LIST=[]
+  List1=[]
+  if(agent_selection_mode=="all available"):
+    for issue in Issues:
+      LIST=data[data['roles']==issue]['Id'].tolist()
+      for j in LIST:
+        List1.append(data[(data['Id']==j) & (data['is_available']==1)]["Id"].tolist())
+      list5 = [x for x in List1 if x != []]
+      print(issue,list5)
+      List1=[]
+  elif(agent_selection_mode=="least busy"):
+    for issue in Issues:
+      df=data[data['roles']==issue]['available_since']
+      df3=data[data['roles']==issue]['Id']
+      df4=pd.concat([df, df3], axis=1)
+      LIST=df4[df4['available_since']==df4['available_since'].min()]['Id'].tolist()
+      for j in LIST:
+        List1.append(data[(data['Id']==j) & (data['is_available']==1)]["Id"].tolist())
+      list5 = [x for x in List1 if x != []]
+      print(issue,list5)
+      List1=[]
+  elif(agent_selection_mode=="random"):
+    for issue in Issues:
+      dataf=data[data['roles']==issue]['Id']
+      df5=pd.DataFrame(dataf,columns=["Id"])
+      LIST=df5.sample(n=1)['Id'].tolist()
+      for j in LIST:
+        List1.append(data[(data['Id']==j) & (data['is_available']==1)]["Id"].tolist())
+      list5 = [x for x in List1 if x != []]
+      print(issue,list5)
+      List1=[]
+
+
+
+
+Mode="all available"
+issue_assigned_agent_list(data,Mode,Issues)
+#Results are the id's of the agents
+
+Mode1="least busy"
+issue_assigned_agent_list(data,Mode1,Issues)
+#Results are the id's of the agents
+
+Mode2="random"
+issue_assigned_agent_list(data,Mode2,Issues)
+#Results are the id's of the agents
+
+
